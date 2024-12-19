@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">health_chat</string>
+    <string name="retry">Retry</string>
+    <string name="something_went_wrong">Something went wrong</string>
+    <string name="send">Send</string>
+    <string name="chat">Chat</string>
+</resources>
