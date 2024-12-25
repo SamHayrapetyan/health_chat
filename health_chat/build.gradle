@@ -62,8 +62,8 @@ afterEvaluate{
             release(MavenPublication){
                 from components.release
 
-                groupId='com.dinno'
-                artifactId = 'health-chat'
+                groupId='github.com.SamHayrapetyan'
+                artifactId = 'ArmedChatSample'
                 version = '1.0.0-alpha01'
             }
         }
