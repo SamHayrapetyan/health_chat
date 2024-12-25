@@ -1,0 +1,13 @@
+<resources>
+    <string name="hc_retry">Réessayer</string>
+    <string name="hc_something_went_wrong">Une erreur s\'est produite</string>
+    <string name="hc_send">Envoyer</string>
+    <string name="hc_back">Retour</string>
+    <string name="hc_start_messaging">Commencer à envoyer des messages</string>
+    <string name="hc_yesterday">Hier</string>
+    <string name="hc_days_hours_template">%d jours, %d heures</string>
+    <string name="hc_unable_to_open_file">Impossible d\'ouvrir le fichier</string>
+    <string name="hc_touch_and_hold_to_record">Touchez et maintenez pour enregistrer</string>
+    <string name="hc_swipe_to_cancel">Faites glisser pour annuler</string>
+    <string name="hc_expired">Expiré</string>
+</resources>

@@ -1,0 +1,13 @@
+<resources>
+    <string name="hc_retry">Pokušaj ponovno</string>
+    <string name="hc_something_went_wrong">Nešto je pošlo po zlu</string>
+    <string name="hc_send">Pošalji</string>
+    <string name="hc_back">Natrag</string>
+    <string name="hc_start_messaging">Počni slati poruke</string>
+    <string name="hc_yesterday">Jučer</string>
+    <string name="hc_days_hours_template">%d dan, %d sati</string>
+    <string name="hc_unable_to_open_file">Datoteku nije moguće otvoriti</string>
+    <string name="hc_touch_and_hold_to_record">Dodirnite i držite za snimanje</string>
+    <string name="hc_swipe_to_cancel">Prijeđite prstom za otkazivanje</string>
+    <string name="hc_expired">Isteklo</string>
+</resources>

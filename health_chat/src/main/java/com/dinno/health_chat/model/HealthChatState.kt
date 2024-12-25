@@ -11,5 +11,17 @@ sealed interface HealthChatState {
     data object Error : HealthChatState
 
     @Immutable
-    data class Active(val messages: List<ChatMessage>) : HealthChatState
+    data class Active(
+        val currentUser: ChatUserModel,
+        val otherUser: ChatUserModel,
+        val chatExpirationEpochDate: Long,
+        val messages: List<ChatMessage>
+    ) : HealthChatState
+
+    @Immutable
+    data class Inactive(
+        val currentUser: ChatUserModel,
+        val otherUser: ChatUserModel,
+        val messages: List<ChatMessage>
+    ) : HealthChatState
 }

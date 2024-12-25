@@ -1,0 +1,13 @@
+<resources>
+    <string name="hc_retry">Փորձել նորից</string>
+    <string name="hc_something_went_wrong">Ինչ-որ բան սխալ գնաց</string>
+    <string name="hc_send">Ուղարկել</string>
+    <string name="hc_back">Հետ</string>
+    <string name="hc_start_messaging">Սկսել հաղորդագրություններ ուղարկել</string>
+    <string name="hc_yesterday">Երեկ</string>
+    <string name="hc_days_hours_template">%d օր, %d ժամ</string>
+    <string name="hc_unable_to_open_file">Չի ստացվում բացել ֆայլը</string>
+    <string name="hc_touch_and_hold_to_record">Ձայնագրելու համար սեղմեք և պահեք</string>
+    <string name="hc_swipe_to_cancel">Չեղարկելու համար սահեցրեք</string>
+    <string name="hc_expired">Ավարտված</string>
+</resources>

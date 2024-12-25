@@ -1,7 +1,14 @@
 <resources>
-    <string name="app_name">health_chat</string>
-    <string name="retry">Retry</string>
-    <string name="something_went_wrong">Something went wrong</string>
-    <string name="send">Send</string>
-    <string name="chat">Chat</string>
+    <string name="hc_retry">Retry</string>
+    <string name="hc_something_went_wrong">Something went wrong</string>
+    <string name="hc_send">Send</string>
+    <string name="hc_back">Back</string>
+    <string name="hc_start_messaging">Start messaging</string>
+    <string name="hc_yesterday">Yesterday</string>
+    <string name="hc_days_hours_template">%dd, %dh</string>
+    <string name="hc_kb_template" translatable="false">%d Kb</string>
+    <string name="hc_unable_to_open_file">Unable to open file</string>
+    <string name="hc_touch_and_hold_to_record">Touch and hold to record</string>
+    <string name="hc_swipe_to_cancel">Swipe to cancel</string>
+    <string name="hc_expired">Expired</string>
 </resources>

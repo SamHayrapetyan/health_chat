@@ -4,5 +4,4 @@ sealed interface MessageStatus {
     data object Pending : MessageStatus
     data object Failed : MessageStatus
     data object Sent : MessageStatus
-    data object Read : MessageStatus
 }

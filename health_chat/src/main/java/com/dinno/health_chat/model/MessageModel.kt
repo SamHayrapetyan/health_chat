@@ -1,5 +1,6 @@
 package com.dinno.health_chat.model
 
+import android.net.Uri
 import androidx.compose.runtime.Immutable
 
 /**
@@ -12,7 +13,6 @@ sealed class ChatMessage(
     open val id: String,
     open val sender: ChatUserModel,
     open val status: MessageStatus,
-    open val text: String?,
     open val creationDateEpoch: Long
 ) {
 
@@ -20,18 +20,28 @@ sealed class ChatMessage(
     data class Text(
         override val id: String,
         override val sender: ChatUserModel,
-        override val text: String,
         override val creationDateEpoch: Long,
-        override val status: MessageStatus
-    ) : ChatMessage(id = id, sender = sender, text = text, creationDateEpoch = creationDateEpoch, status = status)
+        override val status: MessageStatus,
+        val text: String
+    ) : ChatMessage(id = id, sender = sender, creationDateEpoch = creationDateEpoch, status = status)
 
     @Immutable
     data class Media(
         override val id: String,
         override val sender: ChatUserModel,
-        override val text: String,
         override val creationDateEpoch: Long,
         override val status: MessageStatus,
+        val uri: Uri,
         val mediaType: ChatMediaType
-    ) : ChatMessage(id = id, sender = sender, text = text, creationDateEpoch = creationDateEpoch, status = status)
+    ) : ChatMessage(id = id, sender = sender, creationDateEpoch = creationDateEpoch, status = status)
+
+    @Immutable
+    data class Audio(
+        override val id: String,
+        override val sender: ChatUserModel,
+        override val creationDateEpoch: Long,
+        override val status: MessageStatus,
+        val uri: Uri,
+        val isPlaying: Boolean
+    ) : ChatMessage(id = id, sender = sender, creationDateEpoch = creationDateEpoch, status = status)
 }

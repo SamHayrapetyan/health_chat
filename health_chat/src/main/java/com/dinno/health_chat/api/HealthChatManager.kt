@@ -6,5 +6,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface HealthChatManager {
     fun getChatState(): Flow<HealthChatState>
-    fun handleIntent(intent: HealthChatIntent)
+    suspend fun handleIntent(intent: HealthChatIntent)
 }

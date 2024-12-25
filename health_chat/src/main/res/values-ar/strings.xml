@@ -1,0 +1,13 @@
+<resources>
+    <string name="hc_retry">إعادة المحاولة</string>
+    <string name="hc_something_went_wrong">حدث خطأ ما</string>
+    <string name="hc_send">إرسال</string>
+    <string name="hc_back">رجوع</string>
+    <string name="hc_start_messaging">ابدأ المراسلة</string>
+    <string name="hc_yesterday">أمس</string>
+    <string name="hc_days_hours_template">%d يوم، %d ساعة</string>
+    <string name="hc_unable_to_open_file">تعذر فتح الملف</string>
+    <string name="hc_touch_and_hold_to_record">المس واضغط للتسجيل</string>
+    <string name="hc_swipe_to_cancel">اسحب للإلغاء</string>
+    <string name="hc_expired">منتهي الصلاحية</string>
+</resources>

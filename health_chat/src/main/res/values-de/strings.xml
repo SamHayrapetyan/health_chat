@@ -1,0 +1,13 @@
+<resources>
+    <string name="hc_retry">Erneut versuchen</string>
+    <string name="hc_something_went_wrong">Etwas ist schiefgelaufen</string>
+    <string name="hc_send">Senden</string>
+    <string name="hc_back">Zurück</string>
+    <string name="hc_start_messaging">Mit dem Messaging starten</string>
+    <string name="hc_yesterday">Gestern</string>
+    <string name="hc_days_hours_template">%dT, %dStd</string>
+    <string name="hc_unable_to_open_file">Datei kann nicht geöffnet werden</string>
+    <string name="hc_touch_and_hold_to_record">Berühren und halten, um aufzunehmen</string>
+    <string name="hc_swipe_to_cancel">Wischen, um abzubrechen</string>
+    <string name="hc_expired">Abgelaufen</string>
+</resources>

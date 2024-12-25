@@ -1,0 +1,13 @@
+<resources>
+    <string name="hc_retry">Попробовать снова</string>
+    <string name="hc_something_went_wrong">Что-то пошло не так</string>
+    <string name="hc_send">Отправить</string>
+    <string name="hc_back">Назад</string>
+    <string name="hc_start_messaging">Начать отправлять сообщения</string>
+    <string name="hc_yesterday">Вчера</string>
+    <string name="hc_days_hours_template">%d д, %d ч</string>
+    <string name="hc_unable_to_open_file">Не удается открыть файл</string>
+    <string name="hc_touch_and_hold_to_record">Нажмите и удерживайте для записи</string>
+    <string name="hc_swipe_to_cancel">Проведите для отмены</string>
+    <string name="hc_expired">Просрочено</string>
+</resources>

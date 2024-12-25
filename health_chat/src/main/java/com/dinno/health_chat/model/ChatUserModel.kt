@@ -4,7 +4,7 @@ import androidx.compose.runtime.Immutable
 
 @Immutable
 data class ChatUserModel(
-    val name: String,
     val imageUrl: String,
-    val isCurrentUser: Boolean
+    val name: String,
+    val description: String? = null
 )

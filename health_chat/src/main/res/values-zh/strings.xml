@@ -1,0 +1,13 @@
+<resources>
+    <string name="hc_retry">重试</string>
+    <string name="hc_something_went_wrong">出了点问题</string>
+    <string name="hc_send">发送</string>
+    <string name="hc_back">返回</string>
+    <string name="hc_start_messaging">开始发送消息</string>
+    <string name="hc_yesterday">昨天</string>
+    <string name="hc_days_hours_template">%d天, %d小时</string>
+    <string name="hc_unable_to_open_file">无法打开文件</string>
+    <string name="hc_touch_and_hold_to_record">按住以开始录音</string>
+    <string name="hc_swipe_to_cancel">滑动取消</string>
+    <string name="hc_expired">已过期</string>
+</resources>

@@ -1,4 +1,4 @@
-package com.dinno.health_chat.composables
+package com.dinno.health_chat.composables.content
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -44,14 +44,14 @@ internal fun HealthChatErrorState(onRetryClick: () -> Unit) {
             Spacer(modifier = Modifier.height(24.dp))
             Text(
                 modifier = Modifier.fillMaxWidth(),
-                text = stringResource(R.string.something_went_wrong),
+                text = stringResource(R.string.hc_something_went_wrong),
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(12.dp))
             Button(modifier = Modifier.fillMaxWidth(), onClick = onRetryClick) {
-                Text(text = stringResource(R.string.retry))
+                Text(text = stringResource(R.string.hc_retry))
             }
         }
     }
