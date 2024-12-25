@@ -56,15 +56,14 @@ dependencies {
     implementation libs.zoomable
 }
 
-afterEvaluate{
-    publishing{
-        publications{
-            release(MavenPublication){
+afterEvaluate {
+    android.libraryVariants.configureEach { variant ->
+        if (variant.buildType.name == "release") {
+            publishing.publications.create(variant.name, MavenPublication) {
                 from components.release
-
-                groupId='github.com.SamHayrapetyan'
-                artifactId = 'ArmedChatSample'
-                version = '1.0.0-alpha02'
+                groupId = 'github.com.SamHayrapetyan'
+                artifactId = 'health_chat'
+                version = '1.0.0-alpha04'
             }
         }
     }
