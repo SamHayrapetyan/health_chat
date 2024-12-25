@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
+    id 'maven-publish'
 }
 
 android {
@@ -52,5 +53,19 @@ dependencies {
     implementation libs.compose.lifecycle
     implementation libs.lifecycle.viewmodel.compose
     implementation libs.coil
-    implementation "net.engawapg.lib:zoomable:1.6.1"
+    implementation libs.zoomable
+}
+
+afterEvaluate{
+    publishing{
+        publications{
+            release(MavenPublication){
+                from components.release
+
+                groupId='com.dinno'
+                artifactId = 'health-chat'
+                version = '1.0.0-alpha01'
+            }
+        }
+    }
 }

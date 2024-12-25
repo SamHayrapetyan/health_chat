@@ -44,6 +44,7 @@ material-icons = "1.2.0"
 compose = "2.4.0"
 compose-lifecycle = "2.6.1"
 coil = "2.7.0"
+zoomable = "1.6.1"
 
 [libraries]
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
@@ -97,6 +98,7 @@ androidx-activity = { group = "androidx.activity", name = "activity", version.re
 compose-lifecycle = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "compose-lifecycle" }
 lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "compose" }
 coil = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
+zoomable = { module = "net.engawapg.lib:zoomable", version.ref = "zoomable" }
 
 [plugins]
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlinVersion" }
