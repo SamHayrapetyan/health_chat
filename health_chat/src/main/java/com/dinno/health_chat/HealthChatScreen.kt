@@ -3,6 +3,7 @@ package com.dinno.health_chat
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -65,6 +66,9 @@ internal fun HealthChatScreen(
     )
     var openedPhotoUri: Uri? by remember { mutableStateOf(null) }
     var openedFileUri: Uri? by remember { mutableStateOf(null) }
+
+    BackHandler(openedPhotoUri == null) { onNavigateBack() }
+
     Scaffold(
         modifier = modifier
             .unFocusOnTap()

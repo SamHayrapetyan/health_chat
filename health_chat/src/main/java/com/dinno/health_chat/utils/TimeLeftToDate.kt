@@ -1,18 +1,11 @@
 package com.dinno.health_chat.utils
 
-import java.util.concurrent.TimeUnit
+import java.text.SimpleDateFormat
+import java.util.Locale
 
+internal fun Long.toDateString(): String? = runCatching {
+    val outputFormat = SimpleDateFormat(UI_DATE_WITH_HOUR_FORMAT, Locale.getDefault())
+    outputFormat.format(this).replaceFirstChar { it.uppercase() }
+}.getOrNull()
 
-fun Long.timeLeftToDate(): Pair<Long, Long>? {
-    val currentTimeMillis = System.currentTimeMillis()
-    val timeDifferenceMillis = this - currentTimeMillis
-
-    // Ensure the time difference is non-negative
-    if (timeDifferenceMillis <= 0) return null
-
-    // Convert milliseconds to days and hours
-    val days = TimeUnit.MILLISECONDS.toDays(timeDifferenceMillis)
-    val hours = TimeUnit.MILLISECONDS.toHours(timeDifferenceMillis) % 24
-
-    return days to hours
-}
+private const val UI_DATE_WITH_HOUR_FORMAT = "MM.dd.yyyy, HH:mm"

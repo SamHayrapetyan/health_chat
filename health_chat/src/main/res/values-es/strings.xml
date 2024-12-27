@@ -5,9 +5,9 @@
     <string name="hc_back">Atrás</string>
     <string name="hc_message">Mensaje</string>
     <string name="hc_yesterday">Ayer</string>
-    <string name="hc_days_hours_template">%d días, %d horas</string>
+    <string name="hc_until">Hasta</string>
     <string name="hc_unable_to_open_file">No se puede abrir el archivo</string>
     <string name="hc_touch_and_hold_to_record">Toca y mantén presionado para grabar</string>
     <string name="hc_swipe_to_cancel">Desliza para cancelar</string>
-    <string name="hc_expired">Expirado</string>
+    <string name="hc_finished">Terminado</string>
 </resources>

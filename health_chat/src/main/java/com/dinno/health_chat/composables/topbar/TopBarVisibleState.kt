@@ -19,7 +19,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import com.dinno.health_chat.R
 import com.dinno.health_chat.components.ImageWithLoading
 import com.dinno.health_chat.model.ChatUserModel
-import com.dinno.health_chat.utils.timeLeftToDate
+import com.dinno.health_chat.utils.toDateString
 
 @Composable
 internal fun TopBarVisibleState(otherUser: ChatUserModel, chatExpirationEpochDate: Long?, onBackClick: () -> Unit) {
@@ -50,7 +49,7 @@ internal fun TopBarVisibleState(otherUser: ChatUserModel, chatExpirationEpochDat
             Icon(
                 modifier = Modifier.size(16.dp),
                 imageVector = Icons.AutoMirrored.Rounded.ArrowBackIos,
-                tint = Color(0xFF374151),
+                tint = Color(0xFF0E2D6B),
                 contentDescription = null
             )
         }
@@ -78,21 +77,30 @@ internal fun TopBarVisibleState(otherUser: ChatUserModel, chatExpirationEpochDat
             }
         }
         Spacer(modifier = Modifier.weight(weight = 1f, fill = true))
-        Icon(
-            modifier = Modifier.size(22.dp),
-            imageVector = Icons.Rounded.AccessTime,
-            tint = Color(0xFF374151),
-            contentDescription = null
-        )
-        Spacer(modifier = Modifier.width(4.dp))
-        val dateString = stringResource(R.string.hc_days_hours_template)
-        val expired = stringResource(R.string.hc_expired)
-        Text(
-            text = remember(chatExpirationEpochDate) {
-                chatExpirationEpochDate?.timeLeftToDate()?.let { (days, hours) -> dateString.format(days, hours) }
-                    ?: expired
-            },
-            style = MaterialTheme.typography.bodySmall
-        )
+        Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.Center) {
+            val untilString = stringResource(R.string.hc_until)
+            val expiredString = stringResource(R.string.hc_finished)
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(
+
+                    text = if (chatExpirationEpochDate == null) expiredString else untilString,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = Color(0xFF0E2D6B)
+                )
+                Icon(
+                    modifier = Modifier.size(16.dp).alignByBaseline(),
+                    imageVector = Icons.Rounded.AccessTime,
+                    tint = Color(0xFF0E2D6B),
+                    contentDescription = null
+                )
+            }
+            chatExpirationEpochDate?.let {
+                Text(
+                    text = it.toDateString().orEmpty(),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = Color(0xFF0E2D6B)
+                )
+            }
+        }
     }
 }

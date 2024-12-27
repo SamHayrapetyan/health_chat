@@ -63,7 +63,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'github.com.SamHayrapetyan'
                 artifactId = 'health_chat'
-                version = '1.0.0-alpha07'
+                version = '1.0.0'
             }
         }
     }

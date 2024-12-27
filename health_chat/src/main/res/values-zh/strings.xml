@@ -5,9 +5,9 @@
     <string name="hc_back">返回</string>
     <string name="hc_message">消息</string>
     <string name="hc_yesterday">昨天</string>
-    <string name="hc_days_hours_template">%d天, %d小时</string>
+    <string name="hc_until">直到</string>
     <string name="hc_unable_to_open_file">无法打开文件</string>
     <string name="hc_touch_and_hold_to_record">按住以开始录音</string>
     <string name="hc_swipe_to_cancel">滑动取消</string>
-    <string name="hc_expired">已过期</string>
+    <string name="hc_finished">完成</string>
 </resources>

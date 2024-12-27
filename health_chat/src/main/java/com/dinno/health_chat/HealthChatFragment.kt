@@ -45,7 +45,7 @@ class HealthChatFragment : Fragment() {
                     onFileMessageSend = viewModel::onFileMessageSend,
                     onRetryClick = viewModel::onRetryClick,
                     onMessageSendRetryClick = viewModel::onMessageSendRetry,
-                    onNavigateBack = { activity?.onBackPressedDispatcher?.onBackPressed() }
+                    onNavigateBack = viewModel::onNavigateBack
                 )
             }
         }

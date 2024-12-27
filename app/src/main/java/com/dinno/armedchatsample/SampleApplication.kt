@@ -1,6 +1,7 @@
 package com.dinno.armedchatsample
 
 import android.app.Application
+import android.widget.Toast
 import com.dinno.health_chat.api.HealthChatManager
 import com.dinno.health_chat.api.HealthChatManagerHolder
 import com.dinno.health_chat.model.ChatMessage
@@ -111,6 +112,11 @@ class SampleApplication : Application() {
                         }
 
                         is HealthChatIntent.OnRetry -> Unit
+                        is HealthChatIntent.OnNavigateBack -> Toast.makeText(
+                            this@SampleApplication,
+                            "Back triggered",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             }

@@ -178,6 +178,12 @@ internal class HealthChatViewModel(
         viewModelScope.launch { chatManager.handleIntent(HealthChatIntent.OnMessageSendRetry(message)) }
     }
 
+    fun onNavigateBack() {
+        viewModelScope.launch {
+            chatManager.handleIntent(HealthChatIntent.OnNavigateBack)
+        }
+    }
+
     private fun StateFlow<HealthChatState>.active() = (value as? HealthChatState.Active)
 
     override fun onCleared() {
