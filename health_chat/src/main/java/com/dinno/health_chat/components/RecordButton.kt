@@ -13,12 +13,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Mic
@@ -65,35 +65,33 @@ internal fun RecordButton(
     onSwipeOffsetChange: (Float) -> Unit,
     onStartRecording: () -> Boolean,
     onFinishRecording: () -> Unit,
-    onCancelRecording: () -> Unit,
-    modifier: Modifier = Modifier
+    onCancelRecording: () -> Unit
 ) {
     val transition = updateTransition(targetState = recording, label = "record")
     val scale = transition.animateFloat(
         transitionSpec = { spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessLow) },
         label = "record-scale",
-        targetValueByState = { rec -> if (rec) 2f else 1f }
+        targetValueByState = { rec -> if (rec) 2.5f else 1f }
     )
     val containerAlpha = transition.animateFloat(
-        transitionSpec = { tween(500) },
-        label = "record-scale",
+        transitionSpec = { tween(200) },
+        label = "record-alpha",
         targetValueByState = { rec -> if (rec) 1f else 0f }
     )
     val iconColor = transition.animateColor(
         transitionSpec = { tween(200) },
-        label = "record-scale",
+        label = "record-icon-color",
         targetValueByState = { rec -> if (rec) Color(0xFFF1F5F9) else Color(0xFF0E2D6B) }
     )
-
     Box {
         Box(
             Modifier
-                .matchParentSize()
-                .aspectRatio(1f)
                 .graphicsLayer {
                     alpha = containerAlpha.value
                     scaleX = scale.value; scaleY = scale.value
                 }
+                .matchParentSize()
+                .height(IntrinsicSize.Max)
                 .clip(CircleShape)
                 .background(Color(0xFF0E2D6B))
         )
@@ -110,12 +108,9 @@ internal fun RecordButton(
             state = tooltipState
         ) {
             Icon(
-                imageVector = Icons.Default.Mic,
-                contentDescription = null,
-                tint = iconColor.value,
-                modifier = modifier
-                    .sizeIn(minWidth = 56.dp, minHeight = 6.dp)
-                    .padding(18.dp)
+                modifier = Modifier
+                    .size(56.dp)
+                    .padding(16.dp)
                     .voiceRecordingGesture(
                         horizontalSwipeProgress = swipeOffset,
                         onSwipeProgressChanged = onSwipeOffsetChange,
@@ -123,7 +118,10 @@ internal fun RecordButton(
                         onStartRecording = onStartRecording,
                         onFinishRecording = onFinishRecording,
                         onCancelRecording = onCancelRecording,
-                    )
+                    ),
+                imageVector = Icons.Default.Mic,
+                tint = iconColor.value,
+                contentDescription = null
             )
         }
     }

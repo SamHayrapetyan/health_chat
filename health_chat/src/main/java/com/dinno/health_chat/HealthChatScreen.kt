@@ -26,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import com.dinno.health_chat.components.FullScreenImage
 import com.dinno.health_chat.composables.bottombar.HealthChatBottomBar
@@ -98,9 +99,9 @@ internal fun HealthChatScreen(
 
                 is HealthChatState.Inactive -> HealthChatInactiveState(
                     state = state,
-                    onRetryMessageSendClick = onMessageSendRetryClick,
                     onPlayPauseClick = onPlayPauseClick,
-                    onImageClick = { openedPhotoUri = it }
+                    onImageClick = { openedPhotoUri = it },
+                    onFileClick = { openedFileUri = it }
                 )
             }
         }
@@ -111,7 +112,10 @@ internal fun HealthChatScreen(
         visible = openedPhotoUri != null,
         enter = fadeIn(),
         exit = fadeOut()
-    ) { FullScreenImage(url = openedPhotoUri, onDismiss = { openedPhotoUri = null }) }
+    ) {
+        LocalFocusManager.current.clearFocus()
+        FullScreenImage(url = openedPhotoUri, onDismiss = { openedPhotoUri = null })
+    }
 
     val context = LocalContext.current
     val unableToOpenFileText = stringResource(R.string.hc_unable_to_open_file)

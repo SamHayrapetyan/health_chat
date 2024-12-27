@@ -3,7 +3,7 @@
     <string name="hc_something_went_wrong">Something went wrong</string>
     <string name="hc_send">Send</string>
     <string name="hc_back">Back</string>
-    <string name="hc_start_messaging">Start messaging</string>
+    <string name="hc_message">Message</string>
     <string name="hc_yesterday">Yesterday</string>
     <string name="hc_days_hours_template">%dd, %dh</string>
     <string name="hc_kb_template" translatable="false">%d Kb</string>

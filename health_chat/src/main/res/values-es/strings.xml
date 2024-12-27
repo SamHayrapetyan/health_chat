@@ -3,7 +3,7 @@
     <string name="hc_something_went_wrong">Algo salió mal</string>
     <string name="hc_send">Enviar</string>
     <string name="hc_back">Atrás</string>
-    <string name="hc_start_messaging">Comenzar a chatear</string>
+    <string name="hc_message">Mensaje</string>
     <string name="hc_yesterday">Ayer</string>
     <string name="hc_days_hours_template">%d días, %d horas</string>
     <string name="hc_unable_to_open_file">No se puede abrir el archivo</string>

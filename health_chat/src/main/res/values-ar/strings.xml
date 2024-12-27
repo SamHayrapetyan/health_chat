@@ -3,7 +3,7 @@
     <string name="hc_something_went_wrong">حدث خطأ ما</string>
     <string name="hc_send">إرسال</string>
     <string name="hc_back">رجوع</string>
-    <string name="hc_start_messaging">ابدأ المراسلة</string>
+    <string name="hc_message">رسالة</string>
     <string name="hc_yesterday">أمس</string>
     <string name="hc_days_hours_template">%d يوم، %d ساعة</string>
     <string name="hc_unable_to_open_file">تعذر فتح الملف</string>

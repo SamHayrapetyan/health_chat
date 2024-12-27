@@ -1,12 +1,10 @@
 package com.dinno.health_chat.composables.content
 
 import android.net.Uri
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
@@ -23,13 +21,12 @@ import com.dinno.health_chat.model.ChatMediaType
 import com.dinno.health_chat.model.ChatMessage
 import com.dinno.health_chat.model.HealthChatState
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun HealthChatInactiveState(
     state: HealthChatState.Inactive,
-    onRetryMessageSendClick: (ChatMessage) -> Unit,
     onPlayPauseClick: (ChatMessage.Audio) -> Unit,
-    onImageClick: (Uri) -> Unit
+    onImageClick: (Uri) -> Unit,
+    onFileClick: (Uri) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -50,11 +47,18 @@ internal fun HealthChatInactiveState(
                 }
                 when (message) {
                     is ChatMessage.Media -> when (message.mediaType) {
-                        ChatMediaType.PDF -> Unit
+                        ChatMediaType.PDF -> FileChatBubble(
+                            message = message,
+                            isCurrentUser = isCurrentUser,
+                            onRetryMessageSendClick = {},
+                            onFileClick = { onFileClick(message.uri) },
+                            modifier = Modifier.widthIn(max = 260.dp)
+                        )
+
                         ChatMediaType.IMAGE -> ImageChatBubble(
                             message = message,
                             isCurrentUser = isCurrentUser,
-                            onRetryMessageSendClick = { onRetryMessageSendClick(message) },
+                            onRetryMessageSendClick = {},
                             onImageClick = { onImageClick(message.uri) },
                             modifier = Modifier.widthIn(max = 260.dp)
                         )
@@ -64,10 +68,8 @@ internal fun HealthChatInactiveState(
                         TextChatBubble(
                             message = message,
                             isCurrentUser = isCurrentUser,
-                            onRetryMessageSendClick = { onRetryMessageSendClick(message) },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .animateItemPlacement()
+                            onRetryMessageSendClick = {},
+                            modifier = Modifier.widthIn(max = 260.dp)
                         )
                     }
 
@@ -75,7 +77,7 @@ internal fun HealthChatInactiveState(
                         AudioChatBubble(
                             message = message,
                             isCurrentUser = isCurrentUser,
-                            onRetryMessageSendClick = { onRetryMessageSendClick(message) },
+                            onRetryMessageSendClick = {},
                             onPlayPauseClick = { onPlayPauseClick(message) },
                             modifier = Modifier.widthIn(max = 260.dp)
                         )

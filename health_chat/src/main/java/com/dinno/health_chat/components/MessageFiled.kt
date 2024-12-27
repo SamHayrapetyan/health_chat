@@ -7,6 +7,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 
 @Composable
 internal fun MessageField(
@@ -23,7 +24,7 @@ internal fun MessageField(
         enabled = enabled,
         singleLine = false,
         maxLines = 3,
-        placeholder = placeholder?.let { { Text(text = it) } },
+        placeholder = placeholder?.let { { Text(text = it, maxLines = 1, overflow = TextOverflow.Ellipsis) } },
         shape = MaterialTheme.shapes.extraLarge,
         colors = getColors()
     )

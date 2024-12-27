@@ -3,7 +3,7 @@
     <string name="hc_something_went_wrong">出了点问题</string>
     <string name="hc_send">发送</string>
     <string name="hc_back">返回</string>
-    <string name="hc_start_messaging">开始发送消息</string>
+    <string name="hc_message">消息</string>
     <string name="hc_yesterday">昨天</string>
     <string name="hc_days_hours_template">%d天, %d小时</string>
     <string name="hc_unable_to_open_file">无法打开文件</string>
