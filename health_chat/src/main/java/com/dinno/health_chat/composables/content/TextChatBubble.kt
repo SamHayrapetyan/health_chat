@@ -24,13 +24,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
-import com.dinno.health_chat.model.ChatMessage
-import com.dinno.health_chat.model.MessageStatus
-import com.dinno.health_chat.utils.toReadableString
+import com.dinno.health_chat.api.model.MessageStatus
+import com.dinno.health_chat.model.InternalChatMessage
 
 @Composable
 internal fun TextChatBubble(
-    message: ChatMessage.Text,
+    message: InternalChatMessage.Text,
     isCurrentUser: Boolean,
     onRetryMessageSendClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -41,7 +40,7 @@ internal fun TextChatBubble(
     val backgroundColor = if (isCurrentUser) Color(0xFF0E2D6B)
     else Color(0xFFF1F5F9)
     Row(modifier = modifier) {
-        if (isCurrentUser && message.status is MessageStatus.Failed) {
+        if (isCurrentUser && message.domainMessage.status is MessageStatus.Failed) {
             IconButton(
                 modifier = Modifier
                     .align(Alignment.Bottom)
@@ -67,7 +66,7 @@ internal fun TextChatBubble(
         ) {
             SelectionContainer {
                 Text(
-                    text = message.text,
+                    text = message.domainMessage.text,
                     style = MaterialTheme.typography.bodyMedium,
                     color = textColor
                 )
@@ -78,7 +77,7 @@ internal fun TextChatBubble(
                 horizontalArrangement = Arrangement.spacedBy(space = 4.dp)
             ) {
                 if (isCurrentUser) {
-                    when (message.status) {
+                    when (message.domainMessage.status) {
                         MessageStatus.Pending -> CircularProgressIndicator(
                             modifier = Modifier.size(12.dp),
                             strokeWidth = 1.dp,
@@ -103,7 +102,7 @@ internal fun TextChatBubble(
                     }
                 }
                 Text(
-                    text = message.creationDateEpoch.toReadableString(),
+                    text = message.creationDate,
                     style = MaterialTheme.typography.labelSmall,
                     color = textColor
                 )

@@ -6,13 +6,18 @@ import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dinno.health_chat.api.HealthChatManager
+import com.dinno.health_chat.api.model.ChatFileType
+import com.dinno.health_chat.api.model.ChatMessage
+import com.dinno.health_chat.api.model.HealthChatIntent
+import com.dinno.health_chat.api.model.MessageStatus
 import com.dinno.health_chat.audio.AudioPlayer
 import com.dinno.health_chat.audio.AudioRecorder
-import com.dinno.health_chat.model.ChatMediaType
-import com.dinno.health_chat.model.ChatMessage
-import com.dinno.health_chat.model.HealthChatIntent
-import com.dinno.health_chat.model.HealthChatState
-import com.dinno.health_chat.model.MessageStatus
+import com.dinno.health_chat.model.InternalChatMessage
+import com.dinno.health_chat.model.InternalChatState
+import com.dinno.health_chat.utils.getAudioLength
+import com.dinno.health_chat.utils.getFileName
+import com.dinno.health_chat.utils.getFileSize
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -22,6 +27,7 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.UUID
 import kotlin.coroutines.cancellation.CancellationException
@@ -33,29 +39,32 @@ internal class HealthChatViewModel(
     private val audioPlayer: AudioPlayer
 ) : ViewModel() {
 
-    private val _stateFlow: MutableStateFlow<HealthChatState> = MutableStateFlow(HealthChatState.Loading)
-    private val _managerFlow = chatManager.getChatState()
-        .map { (it as? HealthChatState.Active)?.copy(messages = it.messages.asReversed()) ?: it }
+    private var playingAudioMessageId: String? = null
+
+    private val _stateFlow: MutableStateFlow<InternalChatState> = MutableStateFlow(InternalChatState.Loading)
+    private val _managerFlow = chatManager.getChatState().map { it.toInternalState(playingAudioMessageId) }
     val stateFlow = merge(_stateFlow, _managerFlow).stateIn(
         scope = viewModelScope,
         started = SharingStarted.Eagerly,
-        initialValue = HealthChatState.Loading
+        initialValue = InternalChatState.Loading
     )
 
     init {
         audioPlayer.addCompletionListener {
             viewModelScope.launch {
-                _stateFlow.update { state ->
-                    (state as? HealthChatState.Active)?.let {
+                _stateFlow.update {
+                    val state = stateFlow.value
+                    (state as? InternalChatState.Active)?.let {
                         it.copy(messages = it.messages.map { innerMessage ->
-                            (innerMessage as? ChatMessage.Audio)?.copy(isPlaying = false) ?: innerMessage
+                            (innerMessage as? InternalChatMessage.Audio)?.copy(isPlaying = false) ?: innerMessage
                         })
-                    } ?: (state as? HealthChatState.Inactive)?.let {
+                    } ?: (state as? InternalChatState.Inactive)?.let {
                         it.copy(messages = it.messages.map { innerMessage ->
-                            (innerMessage as? ChatMessage.Audio)?.copy(isPlaying = false) ?: innerMessage
+                            (innerMessage as? InternalChatMessage.Audio)?.copy(isPlaying = false) ?: innerMessage
                         })
                     } ?: state
                 }
+                playingAudioMessageId = null
             }
         }
     }
@@ -80,13 +89,12 @@ internal class HealthChatViewModel(
         viewModelScope.launch {
             chatManager.handleIntent(
                 HealthChatIntent.OnMessageSend(
-                    ChatMessage.Media(
+                    ChatMessage.Image(
                         id = UUID.randomUUID().toString(),
                         sender = stateFlow.active()?.currentUser ?: return@launch,
                         creationDateEpoch = System.currentTimeMillis(),
                         status = MessageStatus.Pending,
-                        uri = uri,
-                        mediaType = ChatMediaType.IMAGE
+                        uri = uri
                     )
                 )
             )
@@ -97,13 +105,15 @@ internal class HealthChatViewModel(
         viewModelScope.launch {
             chatManager.handleIntent(
                 HealthChatIntent.OnMessageSend(
-                    ChatMessage.Media(
+                    ChatMessage.File(
                         id = UUID.randomUUID().toString(),
                         sender = stateFlow.active()?.currentUser ?: return@launch,
                         creationDateEpoch = System.currentTimeMillis(),
                         status = MessageStatus.Pending,
                         uri = uri,
-                        mediaType = ChatMediaType.PDF
+                        type = ChatFileType.PDF,
+                        fileName = appContext.getFileName(uri),
+                        fileSizeInBytes = appContext.getFileSize(uri)
                     )
                 )
             )
@@ -128,6 +138,7 @@ internal class HealthChatViewModel(
         viewModelScope.launch {
             runSuspendCatching {
                 audioRecorder.stop()
+                val uri = audioFile?.toUri() ?: return@launch
                 chatManager.handleIntent(
                     HealthChatIntent.OnMessageSend(
                         ChatMessage.Audio(
@@ -135,8 +146,8 @@ internal class HealthChatViewModel(
                             sender = stateFlow.active()?.currentUser ?: return@launch,
                             creationDateEpoch = System.currentTimeMillis(),
                             status = MessageStatus.Pending,
-                            uri = audioFile?.toUri() ?: return@launch,
-                            isPlaying = false
+                            uri = uri,
+                            durationInMilliseconds = appContext.getAudioLength(uri)?.toLongOrNull()
                         )
                     )
                 )
@@ -148,24 +159,32 @@ internal class HealthChatViewModel(
         viewModelScope.launch { runSuspendCatching { audioRecorder.stop() } }
     }
 
-    fun onPlayPauseClick(message: ChatMessage.Audio) {
-        viewModelScope.launch {
+    fun onPlayPauseClick(message: InternalChatMessage.Audio) {
+        viewModelScope.launch(Dispatchers.IO) {
             runSuspendCatching {
                 audioPlayer.stop()
-                _stateFlow.update {
-                    (stateFlow.value as? HealthChatState.Active)?.let {
-                        it.copy(messages = it.messages.map { innerMessage ->
-                            (innerMessage as? ChatMessage.Audio)?.copy(isPlaying = message.id == innerMessage.id && !innerMessage.isPlaying)
-                                ?: innerMessage
-                        })
-                    } ?: (stateFlow.value as? HealthChatState.Inactive)?.let {
-                        it.copy(messages = it.messages.map { innerMessage ->
-                            (innerMessage as? ChatMessage.Audio)?.copy(isPlaying = message.id == innerMessage.id && !innerMessage.isPlaying)
-                                ?: innerMessage
-                        })
-                    } ?: stateFlow.value
+                playingAudioMessageId = null
+                withContext(Dispatchers.Main) {
+                    _stateFlow.update {
+                        (stateFlow.value as? InternalChatState.Active)?.let {
+                            it.copy(messages = it.messages.map { innerMessage ->
+                                (innerMessage as? InternalChatMessage.Audio)?.copy(isPlaying = message.uid == innerMessage.uid && !innerMessage.isPlaying)
+                                    ?: innerMessage
+                            })
+                        } ?: (stateFlow.value as? InternalChatState.Inactive)?.let {
+                            it.copy(messages = it.messages.map { innerMessage ->
+                                (innerMessage as? InternalChatMessage.Audio)?.copy(isPlaying = message.uid == innerMessage.uid && !innerMessage.isPlaying)
+                                    ?: innerMessage
+                            })
+                        } ?: stateFlow.value
+                    }
                 }
-                if (message.isPlaying) audioPlayer.stop() else audioPlayer.playUri(message.uri)
+                if (message.isPlaying) {
+                    audioPlayer.stop()
+                } else {
+                    playingAudioMessageId = message.domainMessage.id
+                    audioPlayer.playUri(message.domainMessage.uri)
+                }
             }
         }
     }
@@ -174,8 +193,10 @@ internal class HealthChatViewModel(
         viewModelScope.launch { chatManager.handleIntent(HealthChatIntent.OnRetry) }
     }
 
-    fun onMessageSendRetry(message: ChatMessage) {
-        viewModelScope.launch { chatManager.handleIntent(HealthChatIntent.OnMessageSendRetry(message)) }
+    fun onMessageSendRetry(message: InternalChatMessage) {
+        viewModelScope.launch {
+            chatManager.handleIntent(HealthChatIntent.OnMessageSendRetry(message.domainMessage))
+        }
     }
 
     fun onNavigateBack() {
@@ -184,7 +205,7 @@ internal class HealthChatViewModel(
         }
     }
 
-    private fun StateFlow<HealthChatState>.active() = (value as? HealthChatState.Active)
+    private fun StateFlow<InternalChatState>.active() = (value as? InternalChatState.Active)
 
     override fun onCleared() {
         super.onCleared()

@@ -4,7 +4,7 @@ import android.content.Context
 import android.media.MediaPlayer
 import android.net.Uri
 
-class AudioPlayer(private val context: Context) {
+internal class AudioPlayer(private val context: Context) {
 
     private var player: MediaPlayer? = null
     private val listeners = mutableListOf<() -> Unit>()

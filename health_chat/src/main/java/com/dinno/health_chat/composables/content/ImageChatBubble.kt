@@ -25,14 +25,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
+import com.dinno.health_chat.api.model.MessageStatus
 import com.dinno.health_chat.components.ImageWithLoading
-import com.dinno.health_chat.model.ChatMessage
-import com.dinno.health_chat.model.MessageStatus
-import com.dinno.health_chat.utils.toReadableString
+import com.dinno.health_chat.model.InternalChatMessage
 
 @Composable
 internal fun ImageChatBubble(
-    message: ChatMessage.Media,
+    message: InternalChatMessage.Image,
     isCurrentUser: Boolean,
     onRetryMessageSendClick: () -> Unit,
     onImageClick: () -> Unit,
@@ -44,7 +43,7 @@ internal fun ImageChatBubble(
     val backgroundColor = if (isCurrentUser) Color(0xFF0E2D6B)
     else Color(0xFFF1F5F9)
     Row(modifier = modifier) {
-        if (isCurrentUser && message.status is MessageStatus.Failed) {
+        if (isCurrentUser && message.domainMessage.status is MessageStatus.Failed) {
             IconButton(
                 modifier = Modifier
                     .align(Alignment.Bottom)
@@ -73,7 +72,7 @@ internal fun ImageChatBubble(
                 modifier = Modifier
                     .clip(MaterialTheme.shapes.small)
                     .heightIn(max = 320.dp),
-                url = message.uri
+                url = message.domainMessage.uri
             )
             Row(
                 modifier = Modifier.align(if (isCurrentUser) Alignment.End else Alignment.Start),
@@ -81,7 +80,7 @@ internal fun ImageChatBubble(
                 horizontalArrangement = Arrangement.spacedBy(space = 4.dp)
             ) {
                 if (isCurrentUser) {
-                    when (message.status) {
+                    when (message.domainMessage.status) {
                         MessageStatus.Pending -> CircularProgressIndicator(
                             modifier = Modifier.size(12.dp),
                             strokeWidth = 1.dp,
@@ -106,7 +105,7 @@ internal fun ImageChatBubble(
                     }
                 }
                 Text(
-                    text = message.creationDateEpoch.toReadableString(),
+                    text = message.creationDate,
                     style = MaterialTheme.typography.labelSmall,
                     color = textColor
                 )

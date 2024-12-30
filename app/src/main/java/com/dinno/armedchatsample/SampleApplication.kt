@@ -2,13 +2,15 @@ package com.dinno.armedchatsample
 
 import android.app.Application
 import android.widget.Toast
+import androidx.core.net.toUri
 import com.dinno.health_chat.api.HealthChatManager
 import com.dinno.health_chat.api.HealthChatManagerHolder
-import com.dinno.health_chat.model.ChatMessage
-import com.dinno.health_chat.model.ChatUserModel
-import com.dinno.health_chat.model.HealthChatIntent
-import com.dinno.health_chat.model.HealthChatState
-import com.dinno.health_chat.model.MessageStatus
+import com.dinno.health_chat.api.model.ChatFileType
+import com.dinno.health_chat.api.model.ChatMessage
+import com.dinno.health_chat.api.model.ChatUserModel
+import com.dinno.health_chat.api.model.HealthChatIntent
+import com.dinno.health_chat.api.model.HealthChatState
+import com.dinno.health_chat.api.model.MessageStatus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -47,6 +49,31 @@ class SampleApplication : Application() {
                             creationDateEpoch = System.currentTimeMillis(),
                             status = MessageStatus.Sent
                         ),
+                        ChatMessage.Audio(
+                            id = UUID.randomUUID().toString(),
+                            sender = otherUser,
+                            creationDateEpoch = System.currentTimeMillis(),
+                            status = MessageStatus.Sent,
+                            uri = "https://commondatastorage.googleapis.com/codeskulptor-assets/Epoq-Lepidoptera.ogg".toUri(),
+                            durationInMilliseconds = null
+                        ),
+                        ChatMessage.File(
+                            id = UUID.randomUUID().toString(),
+                            sender = otherUser,
+                            creationDateEpoch = System.currentTimeMillis(),
+                            status = MessageStatus.Sent,
+                            uri = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf".toUri(),
+                            fileName = "dummy.pdf",
+                            fileSizeInBytes = null,
+                            type = ChatFileType.PDF
+                        ),
+                        ChatMessage.Image(
+                            id = UUID.randomUUID().toString(),
+                            sender = otherUser,
+                            creationDateEpoch = System.currentTimeMillis(),
+                            status = MessageStatus.Sent,
+                            uri = "https://gratisography.com/wp-content/uploads/2024/10/gratisography-cool-cat-800x525.jpg".toUri()
+                        )
                     )
                 )
             }
@@ -58,7 +85,17 @@ class SampleApplication : Application() {
                 override suspend fun handleIntent(intent: HealthChatIntent) {
                     when (intent) {
                         is HealthChatIntent.OnMessageSend -> when (val message = intent.message) {
-                            is ChatMessage.Media -> _state.update {
+                            is ChatMessage.Image -> _state.update {
+                                val newMessage = message.copy(status = MessageStatus.Failed)
+                                (it as? HealthChatState.Active)?.copy(messages = it.messages + newMessage) ?: it
+                            }
+
+                            is ChatMessage.File -> _state.update {
+                                val newMessage = message.copy(status = MessageStatus.Sent)
+                                (it as? HealthChatState.Active)?.copy(messages = it.messages + newMessage) ?: it
+                            }
+
+                            is ChatMessage.Audio -> _state.update {
                                 val newMessage = message.copy(status = MessageStatus.Sent)
                                 (it as? HealthChatState.Active)?.copy(messages = it.messages + newMessage) ?: it
                             }
@@ -75,39 +112,34 @@ class SampleApplication : Application() {
 
                                     val otherUserMessage =
                                         newMessage.copy(id = UUID.randomUUID().toString(), sender = state.otherUser)
-                                    state.copy(messages = state.messages.dropLast(1) + newMessage + otherUserMessage)
+                                    state.copy(messages = state.messages.minus(message) + newMessage + otherUserMessage)
                                 }
-                            }
-
-                            is ChatMessage.Audio -> _state.update {
-                                val newMessage = message.copy(status = MessageStatus.Sent)
-                                (it as? HealthChatState.Active)?.copy(messages = it.messages + newMessage) ?: it
                             }
                         }
 
                         is HealthChatIntent.OnMessageSendRetry -> when (val message = intent.message) {
-                            is ChatMessage.Media -> _state.update {
+                            is ChatMessage.Image -> _state.update {
                                 val newMessage = message.copy(status = MessageStatus.Sent)
-                                (it as? HealthChatState.Active)?.copy(messages = it.messages + newMessage) ?: it
+                                (it as? HealthChatState.Active)?.copy(messages = it.messages.minus(message) + newMessage)
+                                    ?: it
                             }
 
-                            is ChatMessage.Text -> {
-                                _state.update {
-                                    (it as? HealthChatState.Active)?.copy(
-                                        messages = it.messages.map { message ->
-                                            if (message.id == intent.message.id && intent.message.status is MessageStatus.Failed) {
-                                                (intent.message as ChatMessage.Text).copy(status = MessageStatus.Pending)
-                                            } else {
-                                                message
-                                            }
-                                        }
-                                    ) ?: it
-                                }
+                            is ChatMessage.File -> _state.update {
+                                val newMessage = message.copy(status = MessageStatus.Sent)
+                                (it as? HealthChatState.Active)?.copy(messages = it.messages.minus(message) + newMessage)
+                                    ?: it
                             }
 
                             is ChatMessage.Audio -> _state.update {
                                 val newMessage = message.copy(status = MessageStatus.Sent)
-                                (it as? HealthChatState.Active)?.copy(messages = it.messages + newMessage) ?: it
+                                (it as? HealthChatState.Active)?.copy(messages = it.messages.minus(message) + newMessage)
+                                    ?: it
+                            }
+
+                            is ChatMessage.Text -> _state.update {
+                                val newMessage = message.copy(status = MessageStatus.Sent)
+                                (it as? HealthChatState.Active)?.copy(messages = it.messages.minus(message) + newMessage)
+                                    ?: it
                             }
                         }
 

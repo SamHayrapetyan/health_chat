@@ -3,11 +3,11 @@ package com.dinno.health_chat.composables.bottombar
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
-import com.dinno.health_chat.model.HealthChatState
+import com.dinno.health_chat.model.InternalChatState
 
 @Composable
 internal fun HealthChatBottomBar(
-    state: HealthChatState,
+    state: InternalChatState,
     onAudioButtonPressed: () -> Unit,
     onAudioButtonReleased: () -> Unit,
     onAudioButtonCanceled: () -> Unit,
@@ -18,8 +18,8 @@ internal fun HealthChatBottomBar(
     Column {
         HorizontalDivider()
         when (state) {
-            is HealthChatState.Loading -> BottomBarLoadingState()
-            is HealthChatState.Active -> BottomBarVisibleState(
+            is InternalChatState.Loading -> BottomBarLoadingState()
+            is InternalChatState.Active -> BottomBarVisibleState(
                 isEnabled = true,
                 onAudioButtonPressed = onAudioButtonPressed,
                 onAudioButtonReleased = onAudioButtonReleased,
@@ -29,7 +29,7 @@ internal fun HealthChatBottomBar(
                 onTextMessageSend = onTextMessageSend
             )
 
-            is HealthChatState.Inactive -> BottomBarVisibleState(
+            is InternalChatState.Inactive -> BottomBarVisibleState(
                 isEnabled = false,
                 onAudioButtonPressed = onAudioButtonPressed,
                 onAudioButtonReleased = onAudioButtonReleased,
@@ -39,7 +39,7 @@ internal fun HealthChatBottomBar(
                 onTextMessageSend = onTextMessageSend
             )
 
-            is HealthChatState.Error -> Unit
+            is InternalChatState.Error -> Unit
         }
     }
 }

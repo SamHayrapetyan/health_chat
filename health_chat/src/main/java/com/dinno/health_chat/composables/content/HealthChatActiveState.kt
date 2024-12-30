@@ -35,20 +35,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import com.dinno.health_chat.api.model.MessageStatus
 import com.dinno.health_chat.components.ImageWithLoading
-import com.dinno.health_chat.model.ChatMediaType
-import com.dinno.health_chat.model.ChatMessage
-import com.dinno.health_chat.model.HealthChatState
-import com.dinno.health_chat.model.MessageStatus
+import com.dinno.health_chat.model.InternalChatMessage
+import com.dinno.health_chat.model.InternalChatState
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 @Composable
 internal fun HealthChatActiveState(
-    state: HealthChatState.Active,
-    onRetryMessageSendClick: (ChatMessage) -> Unit,
-    onPlayPauseClick: (ChatMessage.Audio) -> Unit,
+    state: InternalChatState.Active,
+    onRetryMessageSendClick: (InternalChatMessage) -> Unit,
+    onPlayPauseClick: (InternalChatMessage.Audio) -> Unit,
     onImageClick: (Uri) -> Unit,
     onFileClick: (Uri) -> Unit
 ) {
@@ -59,11 +58,11 @@ internal fun HealthChatActiveState(
     var showScrollToBottomButton by remember { mutableStateOf(false) }
     LaunchedEffect(lastMessage) {
         when {
-            lastMessage?.sender == state.currentUser && lastMessage?.status !is MessageStatus.Failed -> {
+            lastMessage?.domainMessage?.sender == state.currentUser && lastMessage?.domainMessage?.status !is MessageStatus.Failed && lastMessage !is InternalChatMessage.Audio -> {
                 listState.animateScrollToItem(0)
             }
 
-            lastMessage?.sender == state.otherUser -> {
+            lastMessage?.domainMessage?.sender == state.otherUser -> {
                 if (listState.firstVisibleItemIndex in 0..3) listState.animateScrollToItem(0)
                 else showScrollToBottomButton = true
             }
@@ -84,15 +83,15 @@ internal fun HealthChatActiveState(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.Bottom),
         ) {
-            items(items = state.messages, key = { it.id }) { message ->
+            items(items = state.messages, key = { it.uid }) { message ->
                 Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    val isCurrentUser = remember { message.sender == state.currentUser }
+                    val isCurrentUser = remember { message.domainMessage.sender == state.currentUser }
                     if (!isCurrentUser) {
                         ImageWithLoading(
                             modifier = Modifier
                                 .clip(shape = CircleShape)
                                 .size(32.dp),
-                            url = message.sender.imageUrl
+                            url = message.domainMessage.sender.imageUrl
                         )
                     }
                     Box(
@@ -100,42 +99,36 @@ internal fun HealthChatActiveState(
                         contentAlignment = if (isCurrentUser) Alignment.CenterEnd else Alignment.CenterStart
                     ) {
                         when (message) {
-                            is ChatMessage.Media -> when (message.mediaType) {
-                                ChatMediaType.PDF -> FileChatBubble(
-                                    message = message,
-                                    isCurrentUser = isCurrentUser,
-                                    onRetryMessageSendClick = { onRetryMessageSendClick(message) },
-                                    onFileClick = { onFileClick(message.uri) },
-                                    modifier = Modifier.widthIn(max = 260.dp)
-                                )
+                            is InternalChatMessage.Audio -> AudioChatBubble(
+                                message = message,
+                                isCurrentUser = isCurrentUser,
+                                onRetryMessageSendClick = { onRetryMessageSendClick(message) },
+                                onPlayPauseClick = { onPlayPauseClick(message) },
+                                modifier = Modifier.widthIn(max = 260.dp)
+                            )
 
-                                ChatMediaType.IMAGE -> ImageChatBubble(
-                                    message = message,
-                                    isCurrentUser = isCurrentUser,
-                                    onRetryMessageSendClick = { onRetryMessageSendClick(message) },
-                                    onImageClick = { onImageClick(message.uri) },
-                                    modifier = Modifier.widthIn(max = 260.dp)
-                                )
-                            }
+                            is InternalChatMessage.File -> FileChatBubble(
+                                message = message,
+                                isCurrentUser = isCurrentUser,
+                                onRetryMessageSendClick = { onRetryMessageSendClick(message) },
+                                onFileClick = { onFileClick(message.domainMessage.uri) },
+                                modifier = Modifier.widthIn(max = 260.dp)
+                            )
 
-                            is ChatMessage.Text -> {
-                                TextChatBubble(
-                                    message = message,
-                                    isCurrentUser = isCurrentUser,
-                                    onRetryMessageSendClick = { onRetryMessageSendClick(message) },
-                                    modifier = Modifier.widthIn(max = 260.dp)
-                                )
-                            }
+                            is InternalChatMessage.Image -> ImageChatBubble(
+                                message = message,
+                                isCurrentUser = isCurrentUser,
+                                onRetryMessageSendClick = { onRetryMessageSendClick(message) },
+                                onImageClick = { onImageClick(message.domainMessage.uri) },
+                                modifier = Modifier.widthIn(max = 260.dp)
+                            )
 
-                            is ChatMessage.Audio -> {
-                                AudioChatBubble(
-                                    message = message,
-                                    isCurrentUser = isCurrentUser,
-                                    onRetryMessageSendClick = { onRetryMessageSendClick(message) },
-                                    onPlayPauseClick = { onPlayPauseClick(message) },
-                                    modifier = Modifier.widthIn(max = 260.dp)
-                                )
-                            }
+                            is InternalChatMessage.Text -> TextChatBubble(
+                                message = message,
+                                isCurrentUser = isCurrentUser,
+                                onRetryMessageSendClick = { onRetryMessageSendClick(message) },
+                                modifier = Modifier.widthIn(max = 260.dp)
+                            )
                         }
                     }
                 }

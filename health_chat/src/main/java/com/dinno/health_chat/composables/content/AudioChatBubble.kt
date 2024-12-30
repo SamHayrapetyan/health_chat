@@ -23,25 +23,20 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.dinno.health_chat.R
-import com.dinno.health_chat.model.ChatMessage
-import com.dinno.health_chat.model.MessageStatus
-import com.dinno.health_chat.utils.formatDuration
-import com.dinno.health_chat.utils.getAudioLength
-import com.dinno.health_chat.utils.toReadableString
+import com.dinno.health_chat.api.model.MessageStatus
+import com.dinno.health_chat.model.InternalChatMessage
 
 @Composable
 internal fun AudioChatBubble(
-    message: ChatMessage.Audio,
+    message: InternalChatMessage.Audio,
     isCurrentUser: Boolean,
     onRetryMessageSendClick: () -> Unit,
     onPlayPauseClick: () -> Unit,
@@ -53,7 +48,7 @@ internal fun AudioChatBubble(
     val backgroundColor = if (isCurrentUser) Color(0xFF0E2D6B)
     else Color(0xFFF1F5F9)
     Row(modifier = modifier) {
-        if (isCurrentUser && message.status is MessageStatus.Failed) {
+        if (isCurrentUser && message.domainMessage.status is MessageStatus.Failed) {
             IconButton(
                 modifier = Modifier
                     .align(Alignment.Bottom)
@@ -85,6 +80,7 @@ internal fun AudioChatBubble(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Surface(
+                    modifier = Modifier.size(40.dp),
                     onClick = onPlayPauseClick,
                     shape = CircleShape,
                     color = MaterialTheme.colorScheme.surface,
@@ -106,12 +102,13 @@ internal fun AudioChatBubble(
                     tint = textColor,
                     contentDescription = null
                 )
-                val context = LocalContext.current
-                Text(
-                    text = remember { formatDuration(context.getAudioLength(message.uri)) },
-                    style = MaterialTheme.typography.labelSmall,
-                    color = textColor
-                )
+                message.duration?.let {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = textColor
+                    )
+                }
             }
             Row(
                 modifier = Modifier.align(if (isCurrentUser) Alignment.End else Alignment.Start),
@@ -119,7 +116,7 @@ internal fun AudioChatBubble(
                 horizontalArrangement = Arrangement.spacedBy(space = 4.dp)
             ) {
                 if (isCurrentUser) {
-                    when (message.status) {
+                    when (message.domainMessage.status) {
                         MessageStatus.Pending -> CircularProgressIndicator(
                             modifier = Modifier.size(12.dp),
                             strokeWidth = 1.dp,
@@ -144,7 +141,7 @@ internal fun AudioChatBubble(
                     }
                 }
                 Text(
-                    text = message.creationDateEpoch.toReadableString(),
+                    text = message.creationDate,
                     style = MaterialTheme.typography.labelSmall,
                     color = textColor
                 )

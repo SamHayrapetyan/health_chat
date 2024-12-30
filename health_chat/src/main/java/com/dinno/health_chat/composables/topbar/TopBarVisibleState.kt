@@ -25,14 +25,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.dinno.health_chat.R
+import com.dinno.health_chat.api.model.ChatUserModel
 import com.dinno.health_chat.components.ImageWithLoading
-import com.dinno.health_chat.model.ChatUserModel
-import com.dinno.health_chat.utils.toDateString
 
 @Composable
-internal fun TopBarVisibleState(otherUser: ChatUserModel, chatExpirationEpochDate: Long?, onBackClick: () -> Unit) {
+internal fun TopBarVisibleState(otherUser: ChatUserModel, chatExpirationDate: String?, onBackClick: () -> Unit) {
     Row(
         modifier = Modifier
             .background(color = Color(0xFFF8FAFC))
@@ -61,44 +61,49 @@ internal fun TopBarVisibleState(otherUser: ChatUserModel, chatExpirationEpochDat
             url = otherUser.imageUrl
         )
         Spacer(modifier = Modifier.width(8.dp))
-        Column(verticalArrangement = Arrangement.Center) {
+        Column(modifier = Modifier.weight(weight = 1f, fill = true), verticalArrangement = Arrangement.Center) {
             Text(
-                modifier = Modifier.weight(weight = 1f, fill = false),
                 text = otherUser.name,
                 style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Medium
+                fontWeight = FontWeight.Medium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
             otherUser.description?.let {
                 Text(
-                    modifier = Modifier.weight(weight = 1f, fill = false),
                     text = it,
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodySmall,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }
-        Spacer(modifier = Modifier.weight(weight = 1f, fill = true))
+        Spacer(modifier = Modifier.width(8.dp))
         Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.Center) {
             val untilString = stringResource(R.string.hc_until)
             val expiredString = stringResource(R.string.hc_finished)
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(
-
-                    text = if (chatExpirationEpochDate == null) expiredString else untilString,
+                    text = if (chatExpirationDate == null) expiredString else untilString,
                     style = MaterialTheme.typography.labelMedium,
                     color = Color(0xFF0E2D6B)
                 )
                 Icon(
-                    modifier = Modifier.size(16.dp).alignByBaseline(),
+                    modifier = Modifier
+                        .size(16.dp)
+                        .alignByBaseline(),
                     imageVector = Icons.Rounded.AccessTime,
                     tint = Color(0xFF0E2D6B),
                     contentDescription = null
                 )
             }
-            chatExpirationEpochDate?.let {
+            chatExpirationDate?.let {
                 Text(
-                    text = it.toDateString().orEmpty(),
+                    text = it,
                     style = MaterialTheme.typography.labelMedium,
-                    color = Color(0xFF0E2D6B)
+                    color = Color(0xFF0E2D6B),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }

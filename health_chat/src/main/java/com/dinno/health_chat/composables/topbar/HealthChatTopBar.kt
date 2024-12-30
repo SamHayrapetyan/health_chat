@@ -1,24 +1,24 @@
 package com.dinno.health_chat.composables.topbar
 
 import androidx.compose.runtime.Composable
-import com.dinno.health_chat.model.HealthChatState
+import com.dinno.health_chat.model.InternalChatState
 
 @Composable
-internal fun HealthChatTopBar(state: HealthChatState, onBackClick: () -> Unit) {
+internal fun HealthChatTopBar(state: InternalChatState, onBackClick: () -> Unit) {
     when (state) {
-        is HealthChatState.Active -> TopBarVisibleState(
+        is InternalChatState.Active -> TopBarVisibleState(
             otherUser = state.otherUser,
-            chatExpirationEpochDate = state.chatExpirationEpochDate,
+            chatExpirationDate = state.chatExpirationDate,
             onBackClick = onBackClick
         )
 
-        is HealthChatState.Inactive -> TopBarVisibleState(
+        is InternalChatState.Inactive -> TopBarVisibleState(
             otherUser = state.otherUser,
-            chatExpirationEpochDate = null,
+            chatExpirationDate = null,
             onBackClick = onBackClick
         )
 
-        is HealthChatState.Loading -> TopBarLoadingState(onBackClick = onBackClick)
-        is HealthChatState.Error -> Unit
+        is InternalChatState.Loading -> TopBarLoadingState(onBackClick = onBackClick)
+        is InternalChatState.Error -> Unit
     }
 }

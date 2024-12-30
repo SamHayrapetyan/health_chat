@@ -1,4 +1,4 @@
-package com.dinno.health_chat.model
+package com.dinno.health_chat.api.model
 
 import androidx.compose.runtime.Immutable
 

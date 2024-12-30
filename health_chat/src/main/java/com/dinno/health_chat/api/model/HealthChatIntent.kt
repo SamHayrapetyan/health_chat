@@ -1,4 +1,4 @@
-package com.dinno.health_chat.model
+package com.dinno.health_chat.api.model
 
 sealed interface HealthChatIntent {
     data object OnRetry : HealthChatIntent
