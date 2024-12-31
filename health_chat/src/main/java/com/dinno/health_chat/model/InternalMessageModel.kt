@@ -37,7 +37,13 @@ internal sealed class InternalChatMessage(
         override val domainMessage: ChatMessage.Audio,
         override val uid: String,
         override val creationDate: String,
-        val isPlaying: Boolean,
+        val audioPlayerState: AudioPlayerState,
         val duration: String?
     ) : InternalChatMessage(domainMessage = domainMessage, uid = uid, creationDate = creationDate)
+}
+
+internal sealed interface AudioPlayerState {
+    data object Loading : AudioPlayerState
+    data object Playing : AudioPlayerState
+    data object Paused : AudioPlayerState
 }

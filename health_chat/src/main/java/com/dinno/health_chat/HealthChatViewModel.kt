@@ -11,7 +11,9 @@ import com.dinno.health_chat.api.model.ChatMessage
 import com.dinno.health_chat.api.model.HealthChatIntent
 import com.dinno.health_chat.api.model.MessageStatus
 import com.dinno.health_chat.audio.AudioPlayer
+import com.dinno.health_chat.audio.AudioPlayerListener
 import com.dinno.health_chat.audio.AudioRecorder
+import com.dinno.health_chat.model.AudioPlayerState
 import com.dinno.health_chat.model.InternalChatMessage
 import com.dinno.health_chat.model.InternalChatState
 import com.dinno.health_chat.utils.getAudioLength
@@ -39,10 +41,10 @@ internal class HealthChatViewModel(
     private val audioPlayer: AudioPlayer
 ) : ViewModel() {
 
-    private var playingAudioMessageId: String? = null
+    private var currentAudioMessage: InternalChatMessage.Audio? = null
 
     private val _stateFlow: MutableStateFlow<InternalChatState> = MutableStateFlow(InternalChatState.Loading)
-    private val _managerFlow = chatManager.getChatState().map { it.toInternalState(playingAudioMessageId) }
+    private val _managerFlow = chatManager.getChatState().map { it.toInternalState(currentAudioMessage) }
     val stateFlow = merge(_stateFlow, _managerFlow).stateIn(
         scope = viewModelScope,
         started = SharingStarted.Eagerly,
@@ -50,23 +52,78 @@ internal class HealthChatViewModel(
     )
 
     init {
-        audioPlayer.addCompletionListener {
-            viewModelScope.launch {
-                _stateFlow.update {
-                    val state = stateFlow.value
-                    (state as? InternalChatState.Active)?.let {
-                        it.copy(messages = it.messages.map { innerMessage ->
-                            (innerMessage as? InternalChatMessage.Audio)?.copy(isPlaying = false) ?: innerMessage
-                        })
-                    } ?: (state as? InternalChatState.Inactive)?.let {
-                        it.copy(messages = it.messages.map { innerMessage ->
-                            (innerMessage as? InternalChatMessage.Audio)?.copy(isPlaying = false) ?: innerMessage
-                        })
-                    } ?: state
+        audioPlayer.addCompletionListener(
+            AudioPlayerListener(
+                onStart = {
+                    viewModelScope.launch {
+                        _stateFlow.update {
+                            val state = stateFlow.value
+                            (state as? InternalChatState.Active)?.let { activeState ->
+                                activeState.copy(messages = activeState.messages.map { innerMessage ->
+                                    if (innerMessage.domainMessage.id == currentAudioMessage?.domainMessage?.id) {
+                                        (innerMessage as? InternalChatMessage.Audio)?.copy(audioPlayerState = AudioPlayerState.Playing)
+                                            ?.also { currentAudioMessage = it }
+                                            ?: innerMessage
+                                    } else {
+                                        (innerMessage as? InternalChatMessage.Audio)?.copy(audioPlayerState = AudioPlayerState.Paused)
+                                            ?: innerMessage
+                                    }
+                                })
+                            } ?: (state as? InternalChatState.Inactive)?.let { inActiveState ->
+                                inActiveState.copy(messages = inActiveState.messages.map { innerMessage ->
+                                    if (innerMessage.domainMessage.id == currentAudioMessage?.domainMessage?.id) {
+                                        (innerMessage as? InternalChatMessage.Audio)?.copy(audioPlayerState = AudioPlayerState.Playing)
+                                            ?.also { currentAudioMessage = it }
+                                            ?: innerMessage
+                                    } else {
+                                        (innerMessage as? InternalChatMessage.Audio)?.copy(audioPlayerState = AudioPlayerState.Paused)
+                                            ?: innerMessage
+                                    }
+                                })
+                            } ?: state
+                        }
+                    }
+                },
+                onStop = {
+                    viewModelScope.launch {
+                        currentAudioMessage = null
+                        _stateFlow.update {
+                            val state = stateFlow.value
+                            (state as? InternalChatState.Active)?.let {
+                                it.copy(messages = it.messages.map { innerMessage ->
+                                    (innerMessage as? InternalChatMessage.Audio)?.copy(audioPlayerState = AudioPlayerState.Paused)
+                                        ?: innerMessage
+                                })
+                            } ?: (state as? InternalChatState.Inactive)?.let {
+                                it.copy(messages = it.messages.map { innerMessage ->
+                                    (innerMessage as? InternalChatMessage.Audio)?.copy(audioPlayerState = AudioPlayerState.Paused)
+                                        ?: innerMessage
+                                })
+                            } ?: state
+                        }
+                    }
+                },
+                onComplete = {
+                    viewModelScope.launch {
+                        currentAudioMessage = null
+                        _stateFlow.update {
+                            val state = stateFlow.value
+                            (state as? InternalChatState.Active)?.let {
+                                it.copy(messages = it.messages.map { innerMessage ->
+                                    (innerMessage as? InternalChatMessage.Audio)?.copy(audioPlayerState = AudioPlayerState.Paused)
+                                        ?: innerMessage
+                                })
+                            } ?: (state as? InternalChatState.Inactive)?.let {
+                                it.copy(messages = it.messages.map { innerMessage ->
+                                    (innerMessage as? InternalChatMessage.Audio)?.copy(audioPlayerState = AudioPlayerState.Paused)
+                                        ?: innerMessage
+                                })
+                            } ?: state
+                        }
+                    }
                 }
-                playingAudioMessageId = null
-            }
-        }
+            )
+        )
     }
 
     fun onTextMessageSend(text: String) {
@@ -160,30 +217,39 @@ internal class HealthChatViewModel(
     }
 
     fun onPlayPauseClick(message: InternalChatMessage.Audio) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             runSuspendCatching {
-                audioPlayer.stop()
-                playingAudioMessageId = null
-                withContext(Dispatchers.Main) {
+                if (message.audioPlayerState is AudioPlayerState.Paused) {
                     _stateFlow.update {
-                        (stateFlow.value as? InternalChatState.Active)?.let {
-                            it.copy(messages = it.messages.map { innerMessage ->
-                                (innerMessage as? InternalChatMessage.Audio)?.copy(isPlaying = message.uid == innerMessage.uid && !innerMessage.isPlaying)
-                                    ?: innerMessage
+                        val state = stateFlow.value
+                        (state as? InternalChatState.Active)?.let { activeState ->
+                            activeState.copy(messages = activeState.messages.map { innerMessage ->
+                                if (innerMessage.domainMessage.id == message.domainMessage.id) {
+                                    (innerMessage as? InternalChatMessage.Audio)?.copy(audioPlayerState = AudioPlayerState.Loading)
+                                        ?.also { currentAudioMessage = it }
+                                        ?: innerMessage
+                                } else {
+                                    (innerMessage as? InternalChatMessage.Audio)?.copy(audioPlayerState = AudioPlayerState.Paused)
+                                        ?: innerMessage
+                                }
                             })
-                        } ?: (stateFlow.value as? InternalChatState.Inactive)?.let {
-                            it.copy(messages = it.messages.map { innerMessage ->
-                                (innerMessage as? InternalChatMessage.Audio)?.copy(isPlaying = message.uid == innerMessage.uid && !innerMessage.isPlaying)
-                                    ?: innerMessage
+                        } ?: (state as? InternalChatState.Inactive)?.let { inActiveState ->
+                            inActiveState.copy(messages = inActiveState.messages.map { innerMessage ->
+                                if (innerMessage.domainMessage.id == message.domainMessage.id) {
+                                    (innerMessage as? InternalChatMessage.Audio)?.copy(audioPlayerState = AudioPlayerState.Loading)
+                                        ?.also { currentAudioMessage = it }
+                                        ?: innerMessage
+                                } else {
+                                    (innerMessage as? InternalChatMessage.Audio)?.copy(audioPlayerState = AudioPlayerState.Paused)
+                                        ?: innerMessage
+                                }
                             })
-                        } ?: stateFlow.value
+                        } ?: state
                     }
                 }
-                if (message.isPlaying) {
-                    audioPlayer.stop()
-                } else {
-                    playingAudioMessageId = message.domainMessage.id
-                    audioPlayer.playUri(message.domainMessage.uri)
+                withContext(Dispatchers.IO) {
+                    if (message.audioPlayerState is AudioPlayerState.Paused) audioPlayer.playUri(message.domainMessage.uri)
+                    else audioPlayer.stop()
                 }
             }
         }

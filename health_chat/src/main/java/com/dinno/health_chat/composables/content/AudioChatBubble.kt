@@ -32,6 +32,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.dinno.health_chat.R
 import com.dinno.health_chat.api.model.MessageStatus
+import com.dinno.health_chat.model.AudioPlayerState
 import com.dinno.health_chat.model.InternalChatMessage
 
 @Composable
@@ -85,13 +86,30 @@ internal fun AudioChatBubble(
                     shape = CircleShape,
                     color = MaterialTheme.colorScheme.surface,
                 ) {
-                    AnimatedContent(targetState = message.isPlaying, label = "button icon transition") {
-                        Icon(
-                            modifier = Modifier.padding(8.dp),
-                            imageVector = if (it) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
-                            tint = Color(0xFF0E2D6B),
-                            contentDescription = null
-                        )
+                    AnimatedContent(targetState = message.audioPlayerState, label = "button icon transition") {
+                        when (it) {
+                            AudioPlayerState.Loading -> CircularProgressIndicator(
+                                modifier = Modifier.padding(8.dp),
+                                strokeWidth = 1.dp,
+                                strokeCap = StrokeCap.Round,
+                                color = backgroundColor,
+                                trackColor = textColor
+                            )
+
+                            AudioPlayerState.Paused -> Icon(
+                                modifier = Modifier.padding(8.dp),
+                                imageVector = Icons.Rounded.PlayArrow,
+                                tint = Color(0xFF0E2D6B),
+                                contentDescription = null
+                            )
+
+                            AudioPlayerState.Playing -> Icon(
+                                modifier = Modifier.padding(8.dp),
+                                imageVector = Icons.Rounded.Pause,
+                                tint = Color(0xFF0E2D6B),
+                                contentDescription = null
+                            )
+                        }
                     }
                 }
                 Icon(
