@@ -2,6 +2,11 @@ package com.dinno.health_chat.api.model
 
 import android.net.Uri
 
+/**
+ * Chat message object required to display corresponding ui.
+ *
+ * @throws IllegalArgumentException if id was duplicated.
+ */
 sealed class ChatMessage(
     open val id: String,
     open val sender: ChatUserModel,

@@ -33,7 +33,7 @@ internal fun HealthChatInactiveState(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.Bottom),
     ) {
-        items(items = state.messages, key = { it.uid }) { message ->
+        items(items = state.messages, key = { it.domainMessage.id }) { message ->
             Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 val isCurrentUser = remember { message.domainMessage.sender == state.currentUser }
                 if (!isCurrentUser) {

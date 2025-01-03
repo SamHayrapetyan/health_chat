@@ -9,7 +9,6 @@ import com.dinno.health_chat.utils.bytesToReadableString
 import com.dinno.health_chat.utils.dateEpochToReadableString
 import com.dinno.health_chat.utils.durationToReadableString
 import com.dinno.health_chat.utils.messageDateEpochToReadableString
-import java.util.UUID
 
 internal fun HealthChatState.toInternalState(currentAudioMessage: InternalChatMessage.Audio?): InternalChatState =
     when (this) {
@@ -34,7 +33,6 @@ internal fun ChatMessage.toInternalMessage(currentAudioMessage: InternalChatMess
     when (this) {
         is ChatMessage.Audio -> InternalChatMessage.Audio(
             domainMessage = this,
-            uid = UUID.randomUUID().toString(),
             creationDate = messageDateEpochToReadableString(creationDateEpoch),
             audioPlayerState = if (currentAudioMessage?.domainMessage?.id == id) currentAudioMessage.audioPlayerState else AudioPlayerState.Paused,
             duration = runCatching { durationToReadableString(durationInMilliseconds!!) }.getOrNull()
@@ -42,20 +40,17 @@ internal fun ChatMessage.toInternalMessage(currentAudioMessage: InternalChatMess
 
         is ChatMessage.File -> InternalChatMessage.File(
             domainMessage = this,
-            uid = UUID.randomUUID().toString(),
             creationDate = messageDateEpochToReadableString(creationDateEpoch),
             sizeInKb = runCatching { bytesToReadableString(fileSizeInBytes!!) }.getOrNull(),
         )
 
         is ChatMessage.Image -> InternalChatMessage.Image(
             domainMessage = this,
-            uid = UUID.randomUUID().toString(),
             creationDate = messageDateEpochToReadableString(creationDateEpoch)
         )
 
         is ChatMessage.Text -> InternalChatMessage.Text(
             domainMessage = this,
-            uid = UUID.randomUUID().toString(),
             creationDate = messageDateEpochToReadableString(creationDateEpoch)
         )
     }
