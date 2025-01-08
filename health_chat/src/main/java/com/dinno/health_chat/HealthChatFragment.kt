@@ -45,6 +45,7 @@ class HealthChatFragment : Fragment() {
                     onFileMessageSend = viewModel::onFileMessageSend,
                     onRetryClick = viewModel::onRetryClick,
                     onMessageSendRetryClick = viewModel::onMessageSendRetry,
+                    onNavigateToUser = viewModel::onNavigateToUser,
                     onNavigateBack = viewModel::onNavigateBack
                 )
             }

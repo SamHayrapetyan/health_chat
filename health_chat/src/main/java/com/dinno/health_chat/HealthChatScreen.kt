@@ -53,6 +53,7 @@ internal fun HealthChatScreen(
     onRetryClick: () -> Unit,
     onMessageSendRetryClick: (InternalChatMessage) -> Unit,
     onPlayPauseClick: (InternalChatMessage.Audio) -> Unit,
+    onNavigateToUser: () -> Unit,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -67,7 +68,7 @@ internal fun HealthChatScreen(
     var openedPhotoUri: Uri? by remember { mutableStateOf(null) }
     var openedFileUri: Uri? by remember { mutableStateOf(null) }
 
-    BackHandler(openedPhotoUri == null) { onNavigateBack() }
+    BackHandler(openedPhotoUri != null) { openedPhotoUri = null }
 
     Scaffold(
         modifier = modifier
@@ -76,7 +77,7 @@ internal fun HealthChatScreen(
             .windowInsetsPadding(WindowInsets.systemBars)
             .imePadding(),
         containerColor = Color(0xFFFFFFFF),
-        topBar = { HealthChatTopBar(state = state, onBackClick = onNavigateBack) },
+        topBar = { HealthChatTopBar(state = state, onBackClick = onNavigateBack, onUserClick = onNavigateToUser) },
         bottomBar = {
             HealthChatBottomBar(
                 state = state,

@@ -23,7 +23,7 @@ internal fun HealthChatState.toInternalState(currentAudioMessage: InternalChatMe
         is HealthChatState.Active -> InternalChatState.Active(
             currentUser = currentUser,
             otherUser = otherUser,
-            chatExpirationDate = runCatching { dateEpochToReadableString(chatExpirationEpochDate) }.getOrNull()
+            chatExpirationDate = runCatching { dateEpochToReadableString(chatExpirationDateMillis) }.getOrNull()
                 .orEmpty(),
             messages = messages.asReversed().map { it.toInternalMessage(currentAudioMessage) }
         )
@@ -33,24 +33,24 @@ internal fun ChatMessage.toInternalMessage(currentAudioMessage: InternalChatMess
     when (this) {
         is ChatMessage.Audio -> InternalChatMessage.Audio(
             domainMessage = this,
-            creationDate = messageDateEpochToReadableString(creationDateEpoch),
+            creationDate = messageDateEpochToReadableString(creationDateMillis),
             audioPlayerState = if (currentAudioMessage?.domainMessage?.id == id) currentAudioMessage.audioPlayerState else AudioPlayerState.Paused,
             duration = runCatching { durationToReadableString(durationInMilliseconds!!) }.getOrNull()
         )
 
         is ChatMessage.File -> InternalChatMessage.File(
             domainMessage = this,
-            creationDate = messageDateEpochToReadableString(creationDateEpoch),
+            creationDate = messageDateEpochToReadableString(creationDateMillis),
             sizeInKb = runCatching { bytesToReadableString(fileSizeInBytes!!) }.getOrNull(),
         )
 
         is ChatMessage.Image -> InternalChatMessage.Image(
             domainMessage = this,
-            creationDate = messageDateEpochToReadableString(creationDateEpoch)
+            creationDate = messageDateEpochToReadableString(creationDateMillis)
         )
 
         is ChatMessage.Text -> InternalChatMessage.Text(
             domainMessage = this,
-            creationDate = messageDateEpochToReadableString(creationDateEpoch)
+            creationDate = messageDateEpochToReadableString(creationDateMillis)
         )
     }

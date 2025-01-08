@@ -30,9 +30,15 @@ import androidx.compose.ui.unit.dp
 import com.dinno.health_chat.R
 import com.dinno.health_chat.api.model.ChatUserModel
 import com.dinno.health_chat.components.ImageWithLoading
+import com.dinno.health_chat.modifier.noRippleClickable
 
 @Composable
-internal fun TopBarVisibleState(otherUser: ChatUserModel, chatExpirationDate: String?, onBackClick: () -> Unit) {
+internal fun TopBarVisibleState(
+    otherUser: ChatUserModel,
+    chatExpirationDate: String?,
+    onBackClick: () -> Unit,
+    onUserClick: () -> Unit
+) {
     Row(
         modifier = Modifier
             .background(color = Color(0xFFF8FAFC))
@@ -56,12 +62,17 @@ internal fun TopBarVisibleState(otherUser: ChatUserModel, chatExpirationDate: St
         Spacer(modifier = Modifier.width(8.dp))
         ImageWithLoading(
             modifier = Modifier
+                .noRippleClickable(onClick = onUserClick)
                 .clip(shape = CircleShape)
                 .size(32.dp),
             url = otherUser.imageUrl
         )
         Spacer(modifier = Modifier.width(8.dp))
-        Column(modifier = Modifier.weight(weight = 1f, fill = true), verticalArrangement = Arrangement.Center) {
+        Column(
+            modifier = Modifier
+                .noRippleClickable(onClick = onUserClick)
+                .weight(weight = 1f, fill = true), verticalArrangement = Arrangement.Center
+        ) {
             Text(
                 text = otherUser.name,
                 style = MaterialTheme.typography.bodyLarge,

@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
 
+
 class SampleApplication : Application() {
 
     private val _state: MutableStateFlow<HealthChatState> = MutableStateFlow(HealthChatState.Loading)
@@ -40,19 +41,19 @@ class SampleApplication : Application() {
                         name = "Current Useryan"
                     ),
                     otherUser = otherUser,
-                    chatExpirationEpochDate = System.currentTimeMillis() + 1000 * 60 * 60 * 48,
+                    chatExpirationDateMillis = System.currentTimeMillis() + 60 * 60 * 48 * 1000,
                     messages = listOf(
                         ChatMessage.Text(
                             id = UUID.randomUUID().toString(),
                             sender = otherUser,
                             text = "Bjishk CJSC",
-                            creationDateEpoch = System.currentTimeMillis(),
+                            creationDateMillis = System.currentTimeMillis() - 24 * 60 * 60 * 1000,
                             status = MessageStatus.Sent
                         ),
                         ChatMessage.Audio(
                             id = UUID.randomUUID().toString(),
                             sender = otherUser,
-                            creationDateEpoch = System.currentTimeMillis(),
+                            creationDateMillis = System.currentTimeMillis() - 24 * 60 * 60 * 1000,
                             status = MessageStatus.Sent,
                             uri = "https://commondatastorage.googleapis.com/codeskulptor-assets/Epoq-Lepidoptera.ogg".toUri(),
                             durationInMilliseconds = null
@@ -60,7 +61,7 @@ class SampleApplication : Application() {
                         ChatMessage.File(
                             id = UUID.randomUUID().toString(),
                             sender = otherUser,
-                            creationDateEpoch = System.currentTimeMillis(),
+                            creationDateMillis = System.currentTimeMillis() - 24 * 60 * 60 * 1000,
                             status = MessageStatus.Sent,
                             uri = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf".toUri(),
                             fileName = "dummy.pdf",
@@ -70,7 +71,7 @@ class SampleApplication : Application() {
                         ChatMessage.Image(
                             id = UUID.randomUUID().toString(),
                             sender = otherUser,
-                            creationDateEpoch = System.currentTimeMillis(),
+                            creationDateMillis = System.currentTimeMillis() - 60 * 60 * 48 * 1000,
                             status = MessageStatus.Sent,
                             uri = "https://gratisography.com/wp-content/uploads/2024/10/gratisography-cool-cat-800x525.jpg".toUri()
                         )
@@ -78,6 +79,7 @@ class SampleApplication : Application() {
                 )
             }
         }
+
         HealthChatManagerHolder.initManager(
             object : HealthChatManager {
                 override fun getChatState(): Flow<HealthChatState> = _state
@@ -143,12 +145,15 @@ class SampleApplication : Application() {
                             }
                         }
 
+                        is HealthChatIntent.OnNavigateBack -> {
+                            Toast.makeText(this@SampleApplication, "Back triggered", Toast.LENGTH_SHORT).show()
+                        }
+
+                        is HealthChatIntent.OnNavigateToUser -> {
+                            Toast.makeText(this@SampleApplication, "User clicked", Toast.LENGTH_SHORT).show()
+                        }
+
                         is HealthChatIntent.OnRetry -> Unit
-                        is HealthChatIntent.OnNavigateBack -> Toast.makeText(
-                            this@SampleApplication,
-                            "Back triggered",
-                            Toast.LENGTH_SHORT
-                        ).show()
                     }
                 }
             }

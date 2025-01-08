@@ -44,7 +44,9 @@ internal class HealthChatViewModel(
     private var currentAudioMessage: InternalChatMessage.Audio? = null
 
     private val _stateFlow: MutableStateFlow<InternalChatState> = MutableStateFlow(InternalChatState.Loading)
-    private val _managerFlow = chatManager.getChatState().map { it.toInternalState(currentAudioMessage) }
+    private val _managerFlow = chatManager.getChatState().map {
+        runCatching { it.toInternalState(currentAudioMessage) }.getOrElse { InternalChatState.Error }
+    }
     val stateFlow = merge(_stateFlow, _managerFlow).stateIn(
         scope = viewModelScope,
         started = SharingStarted.Eagerly,
@@ -57,8 +59,7 @@ internal class HealthChatViewModel(
                 onStart = {
                     viewModelScope.launch {
                         _stateFlow.update {
-                            val state = stateFlow.value
-                            (state as? InternalChatState.Active)?.let { activeState ->
+                            stateFlow.active()?.let { activeState ->
                                 activeState.copy(messages = activeState.messages.map { innerMessage ->
                                     if (innerMessage.domainMessage.id == currentAudioMessage?.domainMessage?.id) {
                                         (innerMessage as? InternalChatMessage.Audio)?.copy(audioPlayerState = AudioPlayerState.Playing)
@@ -69,7 +70,7 @@ internal class HealthChatViewModel(
                                             ?: innerMessage
                                     }
                                 })
-                            } ?: (state as? InternalChatState.Inactive)?.let { inActiveState ->
+                            } ?: stateFlow.inActive()?.let { inActiveState ->
                                 inActiveState.copy(messages = inActiveState.messages.map { innerMessage ->
                                     if (innerMessage.domainMessage.id == currentAudioMessage?.domainMessage?.id) {
                                         (innerMessage as? InternalChatMessage.Audio)?.copy(audioPlayerState = AudioPlayerState.Playing)
@@ -80,7 +81,7 @@ internal class HealthChatViewModel(
                                             ?: innerMessage
                                     }
                                 })
-                            } ?: state
+                            } ?: stateFlow.value
                         }
                     }
                 },
@@ -88,18 +89,17 @@ internal class HealthChatViewModel(
                     viewModelScope.launch {
                         currentAudioMessage = null
                         _stateFlow.update {
-                            val state = stateFlow.value
-                            (state as? InternalChatState.Active)?.let {
+                            stateFlow.active()?.let {
                                 it.copy(messages = it.messages.map { innerMessage ->
                                     (innerMessage as? InternalChatMessage.Audio)?.copy(audioPlayerState = AudioPlayerState.Paused)
                                         ?: innerMessage
                                 })
-                            } ?: (state as? InternalChatState.Inactive)?.let {
+                            } ?: stateFlow.inActive()?.let {
                                 it.copy(messages = it.messages.map { innerMessage ->
                                     (innerMessage as? InternalChatMessage.Audio)?.copy(audioPlayerState = AudioPlayerState.Paused)
                                         ?: innerMessage
                                 })
-                            } ?: state
+                            } ?: stateFlow.value
                         }
                     }
                 },
@@ -107,18 +107,17 @@ internal class HealthChatViewModel(
                     viewModelScope.launch {
                         currentAudioMessage = null
                         _stateFlow.update {
-                            val state = stateFlow.value
-                            (state as? InternalChatState.Active)?.let {
+                            stateFlow.active()?.let {
                                 it.copy(messages = it.messages.map { innerMessage ->
                                     (innerMessage as? InternalChatMessage.Audio)?.copy(audioPlayerState = AudioPlayerState.Paused)
                                         ?: innerMessage
                                 })
-                            } ?: (state as? InternalChatState.Inactive)?.let {
+                            } ?: stateFlow.inActive()?.let {
                                 it.copy(messages = it.messages.map { innerMessage ->
                                     (innerMessage as? InternalChatMessage.Audio)?.copy(audioPlayerState = AudioPlayerState.Paused)
                                         ?: innerMessage
                                 })
-                            } ?: state
+                            } ?: stateFlow.value
                         }
                     }
                 }
@@ -133,7 +132,7 @@ internal class HealthChatViewModel(
                     ChatMessage.Text(
                         id = UUID.randomUUID().toString(),
                         sender = stateFlow.active()?.currentUser ?: return@launch,
-                        creationDateEpoch = System.currentTimeMillis(),
+                        creationDateMillis = System.currentTimeMillis(),
                         status = MessageStatus.Pending,
                         text = text
                     )
@@ -149,7 +148,7 @@ internal class HealthChatViewModel(
                     ChatMessage.Image(
                         id = UUID.randomUUID().toString(),
                         sender = stateFlow.active()?.currentUser ?: return@launch,
-                        creationDateEpoch = System.currentTimeMillis(),
+                        creationDateMillis = System.currentTimeMillis(),
                         status = MessageStatus.Pending,
                         uri = uri
                     )
@@ -165,7 +164,7 @@ internal class HealthChatViewModel(
                     ChatMessage.File(
                         id = UUID.randomUUID().toString(),
                         sender = stateFlow.active()?.currentUser ?: return@launch,
-                        creationDateEpoch = System.currentTimeMillis(),
+                        creationDateMillis = System.currentTimeMillis(),
                         status = MessageStatus.Pending,
                         uri = uri,
                         type = ChatFileType.PDF,
@@ -201,7 +200,7 @@ internal class HealthChatViewModel(
                         ChatMessage.Audio(
                             id = UUID.randomUUID().toString(),
                             sender = stateFlow.active()?.currentUser ?: return@launch,
-                            creationDateEpoch = System.currentTimeMillis(),
+                            creationDateMillis = System.currentTimeMillis(),
                             status = MessageStatus.Pending,
                             uri = uri,
                             durationInMilliseconds = appContext.getAudioLength(uri)?.toLongOrNull()
@@ -221,8 +220,7 @@ internal class HealthChatViewModel(
             runSuspendCatching {
                 if (message.audioPlayerState is AudioPlayerState.Paused) {
                     _stateFlow.update {
-                        val state = stateFlow.value
-                        (state as? InternalChatState.Active)?.let { activeState ->
+                        stateFlow.active()?.let { activeState ->
                             activeState.copy(messages = activeState.messages.map { innerMessage ->
                                 if (innerMessage.domainMessage.id == message.domainMessage.id) {
                                     (innerMessage as? InternalChatMessage.Audio)?.copy(audioPlayerState = AudioPlayerState.Loading)
@@ -233,7 +231,7 @@ internal class HealthChatViewModel(
                                         ?: innerMessage
                                 }
                             })
-                        } ?: (state as? InternalChatState.Inactive)?.let { inActiveState ->
+                        } ?: stateFlow.inActive()?.let { inActiveState ->
                             inActiveState.copy(messages = inActiveState.messages.map { innerMessage ->
                                 if (innerMessage.domainMessage.id == message.domainMessage.id) {
                                     (innerMessage as? InternalChatMessage.Audio)?.copy(audioPlayerState = AudioPlayerState.Loading)
@@ -244,7 +242,7 @@ internal class HealthChatViewModel(
                                         ?: innerMessage
                                 }
                             })
-                        } ?: state
+                        } ?: stateFlow.value
                     }
                 }
                 withContext(Dispatchers.IO) {
@@ -260,18 +258,20 @@ internal class HealthChatViewModel(
     }
 
     fun onMessageSendRetry(message: InternalChatMessage) {
-        viewModelScope.launch {
-            chatManager.handleIntent(HealthChatIntent.OnMessageSendRetry(message.domainMessage))
-        }
+        viewModelScope.launch { chatManager.handleIntent(HealthChatIntent.OnMessageSendRetry(message.domainMessage)) }
+    }
+
+    fun onNavigateToUser() {
+        val user = stateFlow.active()?.otherUser ?: stateFlow.inActive()?.otherUser ?: return
+        viewModelScope.launch { chatManager.handleIntent(HealthChatIntent.OnNavigateToUser(user)) }
     }
 
     fun onNavigateBack() {
-        viewModelScope.launch {
-            chatManager.handleIntent(HealthChatIntent.OnNavigateBack)
-        }
+        viewModelScope.launch { chatManager.handleIntent(HealthChatIntent.OnNavigateBack) }
     }
 
     private fun StateFlow<InternalChatState>.active() = (value as? InternalChatState.Active)
+    private fun StateFlow<InternalChatState>.inActive() = (value as? InternalChatState.Inactive)
 
     override fun onCleared() {
         super.onCleared()

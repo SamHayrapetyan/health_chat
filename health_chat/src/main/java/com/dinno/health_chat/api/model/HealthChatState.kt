@@ -14,7 +14,7 @@ sealed interface HealthChatState {
     data class Active(
         val currentUser: ChatUserModel,
         val otherUser: ChatUserModel,
-        val chatExpirationEpochDate: Long,
+        val chatExpirationDateMillis: Long,
         val messages: List<ChatMessage>
     ) : HealthChatState
 
