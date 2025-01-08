@@ -182,7 +182,7 @@ internal class HealthChatViewModel(
         if (recordingJob?.isActive == true) return
         recordingJob = viewModelScope.launch {
             runSuspendCatching {
-                File.createTempFile("temp_audio", ".mp3", appContext.cacheDir).also {
+                File.createTempFile("temp_audio", ".aac", appContext.cacheDir).also {
                     audioRecorder.start(it)
                     audioFile = it
                 }

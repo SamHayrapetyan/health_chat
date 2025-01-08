@@ -55,7 +55,7 @@ class SampleApplication : Application() {
                             sender = otherUser,
                             creationDateMillis = System.currentTimeMillis() - 24 * 60 * 60 * 1000,
                             status = MessageStatus.Sent,
-                            uri = "https://commondatastorage.googleapis.com/codeskulptor-assets/Epoq-Lepidoptera.ogg".toUri(),
+                            uri = "https://www2.iis.fraunhofer.de/AAC/ChID-BLITS-EBU-Narration.mp4".toUri(),
                             durationInMilliseconds = null
                         ),
                         ChatMessage.File(
