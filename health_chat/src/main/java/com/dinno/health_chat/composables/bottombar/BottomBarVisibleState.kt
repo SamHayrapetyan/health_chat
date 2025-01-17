@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Send
-import androidx.compose.material.icons.rounded.AttachFile
 import androidx.compose.material.icons.rounded.Image
 import androidx.compose.material.icons.rounded.Mic
 import androidx.compose.material3.Icon
@@ -94,35 +93,36 @@ internal fun BottomBarVisibleState(
                     enabled = isEnabled,
                     placeholder = stringResource(R.string.hc_message)
                 )
-                AnimatedVisibility(modifier = Modifier.width(88.dp), visible = isTextBlank) {
-                    Row(
-                        modifier = Modifier.padding(end = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy((-12).dp)
+//                AnimatedVisibility(modifier = Modifier.width(88.dp), visible = isTextBlank) {
+                AnimatedVisibility(modifier = Modifier.width(64.dp), visible = isTextBlank) {
+//                    Row(
+//                        modifier = Modifier.padding(end = 8.dp),
+//                        verticalAlignment = Alignment.CenterVertically,
+//                        horizontalArrangement = Arrangement.spacedBy((-12).dp)
+//                    ) {
+                    IconButton(
+                        onClick = onImageButtonClick,
+                        enabled = isEnabled,
                     ) {
-                        IconButton(
-                            onClick = onImageButtonClick,
-                            enabled = isEnabled,
-                        ) {
-                            Icon(
-                                modifier = Modifier.size(24.dp),
-                                imageVector = Icons.Rounded.Image,
-                                tint = color,
-                                contentDescription = null
-                            )
-                        }
-                        IconButton(
-                            onClick = onFileButtonClick,
-                            enabled = isEnabled,
-                        ) {
-                            Icon(
-                                modifier = Modifier.size(24.dp),
-                                imageVector = Icons.Rounded.AttachFile,
-                                tint = color,
-                                contentDescription = null
-                            )
-                        }
+                        Icon(
+                            modifier = Modifier.size(24.dp),
+                            imageVector = Icons.Rounded.Image,
+                            tint = color,
+                            contentDescription = null
+                        )
                     }
+//                        IconButton(
+//                            onClick = onFileButtonClick,
+//                            enabled = isEnabled,
+//                        ) {
+//                            Icon(
+//                                modifier = Modifier.size(24.dp),
+//                                imageVector = Icons.Rounded.AttachFile,
+//                                tint = color,
+//                                contentDescription = null
+//                            )
+//                        }
+//                }
                 }
             }
         }
